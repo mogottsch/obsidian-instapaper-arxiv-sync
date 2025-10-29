@@ -1,0 +1,10 @@
+{
+  "id": "instapaper-arxiv-sync",
+  "name": "Instapaper ArXiv Sync",
+  "version": "0.1.0",
+  "minAppVersion": "1.0.0",
+  "description": "Sync ArXiv papers from Instapaper to your Obsidian vault",
+  "author": "Moritz Gottschling",
+  "authorUrl": "https://github.com/mogottsch",
+  "isDesktopOnly": false
+}
