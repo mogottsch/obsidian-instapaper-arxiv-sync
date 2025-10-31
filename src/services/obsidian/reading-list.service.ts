@@ -44,13 +44,21 @@ export class ReadingListService {
   }
 
   private updateReadingList(existing: string, papers: readonly Paper[]): string {
+    const existingArxivIds = this.extractExistingArxivIds(existing);
+    const newPapers = papers.filter((paper) => !existingArxivIds.has(paper.arxivId));
+
+    if (newPapers.length === 0) {
+      const lastUpdatedRegex = /Last updated: .*/;
+      return existing.replace(lastUpdatedRegex, `Last updated: ${getCurrentDateTime()}`);
+    }
+
     const lastUpdatedRegex = /Last updated: .*/;
     const updatedHeader = existing.replace(
       lastUpdatedRegex,
       `Last updated: ${getCurrentDateTime()}`
     );
 
-    const newRows = papers.map((paper) => this.createTableRow(paper)).join("\n");
+    const newRows = newPapers.map((paper) => this.createTableRow(paper)).join("\n");
 
     const tableHeaderRegex = /\|\s*Paper\s*\|.*\|\s*\n\|\s*-+\s*\|.*\|\s*\n/;
     const match = tableHeaderRegex.exec(updatedHeader);
@@ -66,6 +74,23 @@ export class ReadingListService {
     }
 
     return `${updatedHeader}\n${newRows}`;
+  }
+
+  private extractExistingArxivIds(content: string): Set<string> {
+    const arxivIds = new Set<string>();
+    const arxivLinkRegex =
+      /\[(\d{4}\.\d{4,5}(?:v\d+)?)\]\(https:\/\/arxiv\.org\/abs\/\d{4}\.\d{4,5}(?:v\d+)?\)/g;
+
+    let match;
+    while ((match = arxivLinkRegex.exec(content)) !== null) {
+      const arxivId = match[1];
+      if (arxivId !== undefined && arxivId.length > 0) {
+        const idWithoutVersion = arxivId.replace(/v\d+$/, "");
+        arxivIds.add(idWithoutVersion);
+      }
+    }
+
+    return arxivIds;
   }
 
   private createHeader(): string {
