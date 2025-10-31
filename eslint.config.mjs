@@ -59,14 +59,6 @@ export default tseslint.config(
     },
   },
   {
-    files: ["**/*.test.ts"],
-    rules: {
-      "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-unsafe-assignment": "off",
-      "@typescript-eslint/no-unsafe-member-access": "off",
-    },
-  },
-  {
-    ignores: ["dist/", "node_modules/", "main.js", "*.config.mjs", "*.config.ts"],
+    ignores: ["dist/", "node_modules/", "main.js", "*.config.mjs", "*.config.ts", "**/*.test.ts"],
   }
 );

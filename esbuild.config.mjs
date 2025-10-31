@@ -31,6 +31,7 @@ if (watch) {
   console.log("Watching for changes...");
 } else {
   await esbuild.build(esbuildConfig);
+
   if (production) {
     console.log("Production build complete");
   }

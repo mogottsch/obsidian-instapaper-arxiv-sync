@@ -1,11 +1,3 @@
-import { Plugin } from "obsidian";
+import { InstapaperArxivSyncPlugin } from "./core/plugin";
 
-export default class InstapaperArxivSyncPlugin extends Plugin {
-  onload(): void {
-    // Plugin initialization
-  }
-
-  onunload(): void {
-    // Cleanup
-  }
-}
+export default InstapaperArxivSyncPlugin;
