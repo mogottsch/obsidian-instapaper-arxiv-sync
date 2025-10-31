@@ -1,8 +1,12 @@
 name: Release
 
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -68,9 +72,10 @@ jobs:
           name: release
           path: release.zip
           retention-days: 30
-      - name: Attach release archive to release
+      - name: Create or update release
         uses: softprops/action-gh-release@v2
         with:
           files: release.zip
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
