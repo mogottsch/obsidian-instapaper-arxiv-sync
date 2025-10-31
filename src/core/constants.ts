@@ -9,7 +9,7 @@ export const INSTAPAPER_API = {
 } as const;
 
 export const ARXIV_API = {
-  BASE_URL: "http://export.arxiv.org/api/query",
+  BASE_URL: "https://export.arxiv.org/api/query",
   RATE_LIMIT_SECONDS: 3,
   MAX_RESULTS_PER_REQUEST: 100,
 } as const;
