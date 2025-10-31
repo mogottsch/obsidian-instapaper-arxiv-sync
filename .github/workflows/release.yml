@@ -1,0 +1,76 @@
+name: Release
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build
+        run: pnpm build
+      - name: Get version from manifest
+        id: manifest
+        run: |
+          MANIFEST_VERSION=$(node -p "require('./manifest.json').version")
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          RELEASE_TAG=${GITHUB_REF#refs/tags/}
+          RELEASE_VERSION=${RELEASE_TAG#v}
+          echo "MANIFEST_VERSION=$MANIFEST_VERSION" >> $GITHUB_OUTPUT
+          echo "PACKAGE_VERSION=$PACKAGE_VERSION" >> $GITHUB_OUTPUT
+          echo "RELEASE_VERSION=$RELEASE_VERSION" >> $GITHUB_OUTPUT
+      - name: Validate version consistency
+        run: |
+          if [ "${{ steps.manifest.outputs.MANIFEST_VERSION }}" != "${{ steps.manifest.outputs.RELEASE_VERSION }}" ]; then
+            echo "Error: Release tag version (${{ steps.manifest.outputs.RELEASE_VERSION }}) does not match manifest.json version (${{ steps.manifest.outputs.MANIFEST_VERSION }})"
+            exit 1
+          fi
+          if [ "${{ steps.manifest.outputs.MANIFEST_VERSION }}" != "${{ steps.manifest.outputs.PACKAGE_VERSION }}" ]; then
+            echo "Error: manifest.json version (${{ steps.manifest.outputs.MANIFEST_VERSION }}) does not match package.json version (${{ steps.manifest.outputs.PACKAGE_VERSION }})"
+            exit 1
+          fi
+          echo "✓ Version validation passed: ${{ steps.manifest.outputs.MANIFEST_VERSION }}"
+      - name: Get minAppVersion
+        id: minAppVersion
+        run: echo "MINAPPVERSION=$(node -p "require('./manifest.json').minAppVersion")" >> $GITHUB_OUTPUT
+      - name: Update versions.json
+        run: |
+          node -e "
+          const fs = require('fs');
+          const versions = JSON.parse(fs.readFileSync('versions.json', 'utf8'));
+          const manifest = JSON.parse(fs.readFileSync('manifest.json', 'utf8'));
+          versions[manifest.version] = manifest.minAppVersion;
+          fs.writeFileSync('versions.json', JSON.stringify(versions, null, 2) + '\n');
+          "
+      - name: Create release archive
+        run: |
+          mkdir release
+          cp main.js manifest.json release/
+          if [ -f styles.css ]; then cp styles.css release/; fi
+          cd release
+          zip -r ../release.zip .
+          cd ..
+      - name: Upload release archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: release
+          path: release.zip
+          retention-days: 30
+      - name: Attach release archive to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
