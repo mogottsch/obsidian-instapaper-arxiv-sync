@@ -8,7 +8,7 @@ export class SyncModal extends Modal {
     const { contentEl } = this;
     contentEl.empty();
 
-    contentEl.createEl("h2", { text: "Syncing Instapaper Papers" });
+    contentEl.createEl("h2", { text: "Syncing Instapaper papers" });
 
     this.statusEl = contentEl.createDiv({ cls: "sync-status" });
     this.statusEl.setText("Initializing...");

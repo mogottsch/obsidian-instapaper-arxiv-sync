@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { isEmptyString, isValidUrl, isValidArxivId, isSafePath } from "./validation";
+import { isEmptyString, isValidUrl, isValidArxivId } from "./validation";
 
 describe("Validation", () => {
   describe("isEmptyString", () => {
@@ -48,25 +48,6 @@ describe("Validation", () => {
       expect(isValidArxivId("invalid")).toBe(false);
       expect(isValidArxivId("123.456")).toBe(false);
       expect(isValidArxivId("")).toBe(false);
-    });
-  });
-
-  describe("isSafePath", () => {
-    it("should return true for safe paths", () => {
-      expect(isSafePath("Papers")).toBe(true);
-      expect(isSafePath("Papers/Research")).toBe(true);
-      expect(isSafePath("folder/subfolder/file.md")).toBe(true);
-    });
-
-    it("should return false for paths with traversal", () => {
-      expect(isSafePath("../Papers")).toBe(false);
-      expect(isSafePath("Papers/../Other")).toBe(false);
-      expect(isSafePath("../../etc/passwd")).toBe(false);
-    });
-
-    it("should return false for absolute paths", () => {
-      expect(isSafePath("/Papers")).toBe(false);
-      expect(isSafePath("/home/user/vault")).toBe(false);
     });
   });
 });

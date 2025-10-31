@@ -1,70 +1,64 @@
-import { Vault, TFolder, TFile } from "obsidian";
+import { Vault, TFolder, TFile, normalizePath } from "obsidian";
 import { Result, ok, err } from "../../utils/result";
 import { ObsidianError } from "../../types/errors";
-import { isSafePath } from "../../utils/validation";
 
 export class VaultService {
   constructor(private readonly vault: Vault) {}
 
   async ensureFolderExists(path: string): Promise<Result<void, ObsidianError>> {
-    if (!isSafePath(path)) {
-      return err({ type: "INVALID_PATH", path });
-    }
+    const normalizedPath = normalizePath(path);
 
     try {
-      const folder = this.vault.getAbstractFileByPath(path);
+      const folder = this.vault.getAbstractFileByPath(normalizedPath);
       if (folder instanceof TFolder) {
         return ok(undefined);
       }
 
-      await this.vault.createFolder(path);
+      await this.vault.createFolder(normalizedPath);
       return ok(undefined);
     } catch {
-      const folder = this.vault.getAbstractFileByPath(path);
+      const folder = this.vault.getAbstractFileByPath(normalizedPath);
       if (folder instanceof TFolder) {
         return ok(undefined);
       }
 
       return err({
         type: "FOLDER_CREATE_FAILED",
-        path,
+        path: normalizedPath,
       });
     }
   }
 
   fileExists(path: string): boolean {
-    const file = this.vault.getAbstractFileByPath(path);
+    const normalizedPath = normalizePath(path);
+    const file = this.vault.getAbstractFileByPath(normalizedPath);
     return file instanceof TFile;
   }
 
   async createFile(path: string, content: string): Promise<Result<void, ObsidianError>> {
-    if (!isSafePath(path)) {
-      return err({ type: "INVALID_PATH", path });
-    }
+    const normalizedPath = normalizePath(path);
 
     try {
-      await this.vault.create(path, content);
+      await this.vault.create(normalizedPath, content);
       return ok(undefined);
     } catch (error) {
       return err({
         type: "FILE_WRITE_FAILED",
-        path,
+        path: normalizedPath,
         message: error instanceof Error ? error.message : "Unknown error",
       });
     }
   }
 
   async readFile(path: string): Promise<Result<string, ObsidianError>> {
-    if (!isSafePath(path)) {
-      return err({ type: "INVALID_PATH", path });
-    }
+    const normalizedPath = normalizePath(path);
 
     try {
-      const file = this.vault.getAbstractFileByPath(path);
+      const file = this.vault.getAbstractFileByPath(normalizedPath);
       if (!(file instanceof TFile)) {
         return err({
           type: "FILE_READ_FAILED",
-          path,
+          path: normalizedPath,
           message: "File not found",
         });
       }
@@ -74,23 +68,21 @@ export class VaultService {
     } catch (error) {
       return err({
         type: "FILE_READ_FAILED",
-        path,
+        path: normalizedPath,
         message: error instanceof Error ? error.message : "Unknown error",
       });
     }
   }
 
   async modifyFile(path: string, content: string): Promise<Result<void, ObsidianError>> {
-    if (!isSafePath(path)) {
-      return err({ type: "INVALID_PATH", path });
-    }
+    const normalizedPath = normalizePath(path);
 
     try {
-      const file = this.vault.getAbstractFileByPath(path);
+      const file = this.vault.getAbstractFileByPath(normalizedPath);
       if (!(file instanceof TFile)) {
         return err({
           type: "FILE_WRITE_FAILED",
-          path,
+          path: normalizedPath,
           message: "File not found",
         });
       }
@@ -100,7 +92,7 @@ export class VaultService {
     } catch (error) {
       return err({
         type: "FILE_WRITE_FAILED",
-        path,
+        path: normalizedPath,
         message: error instanceof Error ? error.message : "Unknown error",
       });
     }

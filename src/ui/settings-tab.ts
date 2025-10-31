@@ -17,7 +17,7 @@ export class InstapaperSyncSettingsTab extends PluginSettingTab {
   }
 
   private addTestConnectionButton(containerEl: HTMLElement): void {
-    new Setting(containerEl).setName("Test Connection").addButton((button) =>
+    new Setting(containerEl).setName("Test connection").addButton((button) =>
       button
         .setButtonText("Test")
         .setCta()
@@ -46,7 +46,7 @@ export class InstapaperSyncSettingsTab extends PluginSettingTab {
     });
 
     new Setting(containerEl)
-      .setName("OAuth Consumer Key")
+      .setName("OAuth consumer key")
       .setDesc("Your Instapaper OAuth consumer key")
       .addText((text) =>
         text
@@ -62,7 +62,7 @@ export class InstapaperSyncSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("OAuth Consumer Secret")
+      .setName("OAuth consumer secret")
       .setDesc("Your Instapaper OAuth consumer secret")
       .addText((text) => {
         text
@@ -117,7 +117,7 @@ export class InstapaperSyncSettingsTab extends PluginSettingTab {
   }
 
   private displayInstapaperCredentials(containerEl: HTMLElement): void {
-    containerEl.createEl("h3", { text: "Instapaper Credentials" });
+    new Setting(containerEl).setHeading().setName("Instapaper credentials");
 
     this.addOAuthFields(containerEl);
     this.addUserCredentials(containerEl);
@@ -125,10 +125,10 @@ export class InstapaperSyncSettingsTab extends PluginSettingTab {
   }
 
   private displayVaultConfiguration(containerEl: HTMLElement): void {
-    containerEl.createEl("h3", { text: "Vault Configuration" });
+    new Setting(containerEl).setHeading().setName("Vault configuration");
 
     new Setting(containerEl)
-      .setName("Papers Folder")
+      .setName("Papers folder")
       .setDesc("Folder where paper notes will be created")
       .addText((text) =>
         text
@@ -144,7 +144,7 @@ export class InstapaperSyncSettingsTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Reading List Filename")
+      .setName("Reading list filename")
       .setDesc("Name of the reading list file")
       .addText((text) =>
         text
@@ -176,8 +176,6 @@ export class InstapaperSyncSettingsTab extends PluginSettingTab {
   display(): void {
     const { containerEl } = this;
     containerEl.empty();
-
-    containerEl.createEl("h2", { text: "Instapaper ArXiv Sync Settings" });
 
     this.displayInstapaperCredentials(containerEl);
     this.displayVaultConfiguration(containerEl);

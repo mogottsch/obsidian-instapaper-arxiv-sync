@@ -16,7 +16,3 @@ export function isValidArxivId(id: string): boolean {
   const oldFormat = /^[a-z-]+\/\d{7}$/;
   return newFormat.test(id) || oldFormat.test(id);
 }
-
-export function isSafePath(path: string): boolean {
-  return !path.includes("..") && !path.startsWith("/");
-}

@@ -1,4 +1,4 @@
-import { Plugin } from "obsidian";
+import { Plugin, normalizePath } from "obsidian";
 import { PluginSettings } from "../types/config";
 import { DEFAULT_SETTINGS } from "./settings";
 import { UI, COMMANDS } from "./constants";
@@ -35,7 +35,12 @@ export class InstapaperArxivSyncPlugin extends Plugin {
 
   async loadSettings(): Promise<void> {
     const data = (await this.loadData()) as Partial<PluginSettings> | null;
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, data ?? {});
+    const baseSettings = Object.assign({}, DEFAULT_SETTINGS, data ?? {});
+    this.settings = {
+      ...baseSettings,
+      papersFolder: normalizePath(baseSettings.papersFolder),
+      readingListFilename: normalizePath(baseSettings.readingListFilename),
+    };
   }
 
   async saveSettings(): Promise<void> {
